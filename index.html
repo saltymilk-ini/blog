@@ -193,7 +193,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2025-09-23 16:00:00 / 修改时间：18:20:30" itemprop="dateCreated datePublished" datetime="2025-09-23T16:00:00+08:00">2025-09-23</time>
+      <time title="创建时间：2025-09-23 16:00:00 / 修改时间：18:21:19" itemprop="dateCreated datePublished" datetime="2025-09-23T16:00:00+08:00">2025-09-23</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -221,7 +221,6 @@
 <p>我们常用的 <code>std::cout &lt;&lt; "..."</code> 其实就是一个 ADL 的例子。<code>std::cout</code>，查看一下 STL 的代码，它是 <code>std::basic_ostream&lt;char, std::char_traits&lt;char&gt;&gt;</code>，而这个类只定义了针对算术类型和指针类型的 <code>operator&lt;&lt;</code> 并没有定义针对 <code>const char *</code> 的版本，使用编译器的跳转功能跳转到 <code>&lt;&lt;</code> 的调用，其实是:</p>
 <details open>
 <summary>代码</summary>
-</details>
 <pre>
 <code>
 template&lt;class _Traits&gt;
