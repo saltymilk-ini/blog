@@ -4,18 +4,20 @@
   <meta charset="utf-8">
   
   
-  <title>Blog</title>
+  <title>C++ ADL 与 模板 | Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="什么是 ADL ADL(Argument Dependent Lookup)，参数依赖查找，明确的意思是依赖参数的函数查找，即对于函数调用，不仅会依照常规的名称查找规则，还会在函数参数所在的命名空间内查找。 我们常用的 std::cout &lt;&lt; &quot;...&quot; 其实就是一个 ADL 的例子，std::cout，查看一下 STL 的代码，它是std::basic_ostream&lt;cha">
+  <meta name="description" content="什么是 ADL ADL(Argument Dependent Lookup)，参数依赖查找，明确的意思是依赖参数的函数查找，即对于函数调用，不仅会依照常规的名称查找规则，还会在函数参数所在的命名空间内查找。 我们常用的 std::cout &lt;&lt; &quot;...&quot; 其实就是一个 ADL 的例子，std::cout，查看一下 STL 的代码，它是std::basic_ostream&lt;ch">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Blog">
+<meta property="og:title" content="C++ ADL 与 模板">
 <meta property="og:url" content="https://saltymilk-ini.github.io/blog/2025/09/23/C-ADL-%E4%B8%8E-%E6%A8%A1%E6%9D%BF/index.html">
 <meta property="og:site_name" content="Blog">
-<meta property="og:description" content="什么是 ADL ADL(Argument Dependent Lookup)，参数依赖查找，明确的意思是依赖参数的函数查找，即对于函数调用，不仅会依照常规的名称查找规则，还会在函数参数所在的命名空间内查找。 我们常用的 std::cout &lt;&lt; &quot;...&quot; 其实就是一个 ADL 的例子，std::cout，查看一下 STL 的代码，它是std::basic_ostream&lt;cha">
+<meta property="og:description" content="什么是 ADL ADL(Argument Dependent Lookup)，参数依赖查找，明确的意思是依赖参数的函数查找，即对于函数调用，不仅会依照常规的名称查找规则，还会在函数参数所在的命名空间内查找。 我们常用的 std::cout &lt;&lt; &quot;...&quot; 其实就是一个 ADL 的例子，std::cout，查看一下 STL 的代码，它是std::basic_ostream&lt;ch">
 <meta property="og:locale">
-<meta property="article:published_time" content="2025-09-23T07:06:42.566Z">
-<meta property="article:modified_time" content="2025-09-23T07:07:12.348Z">
+<meta property="article:published_time" content="2025-09-23T08:00:00.000Z">
+<meta property="article:modified_time" content="2025-09-23T08:01:15.748Z">
 <meta property="article:author" content="saltymilk">
+<meta property="article:tag" content="HTML">
+<meta property="article:tag" content="Hexo">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternate" href="/blog/atom.xml" title="Blog" type="application/atom+xml">
@@ -80,16 +82,31 @@
         <section id="main"><article id="post-C-ADL-与-模板" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/blog/2025/09/23/C-ADL-%E4%B8%8E-%E6%A8%A1%E6%9D%BF/" class="article-date">
-  <time class="dt-published" datetime="2025-09-23T07:06:42.566Z" itemprop="datePublished">2025-09-23</time>
+  <time class="dt-published" datetime="2025-09-23T08:00:00.000Z" itemprop="datePublished">2025-09-23</time>
 </a>
     
+  <div class="article-category">
+    <a class="article-category-link" href="/blog/categories/%E6%8A%80%E6%9C%AF/">技术</a>
+  </div>
+
   </div>
   <div class="article-inner">
     
     
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      C++ ADL 与 模板
+    </h1>
+  
+
+      </header>
+    
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <h1>什么是 ADL</h1>
+        
+<h1>什么是 ADL</h1>
 <p>ADL(Argument Dependent Lookup)，参数依赖查找，明确的意思是<b>依赖参数的函数查找</b>，即对于函数调用，不仅会依照常规的名称查找规则，还会在函数参数所在的命名空间内查找。</p>
 <p>我们常用的 <code>std::cout &lt;&lt; "..."</code> 其实就是一个 ADL 的例子，std::cout，查看一下 STL 的代码，它是<code>std::basic_ostream&lt;char, std::char_traits&lt;char&gt;&gt;</code>，而这个类只定义了针对算术类型和指针类型的 operator<< 并没有定义针对 const char * 的版本，使用编译器的跳转功能跳转到 << 的调用，其实是<br>
 <code>template&lt;class _Traits&gt;<br>std::basic_ostream&lt;char, _Traits&gt; operator&lt;&lt;(std::basic_ostream&lt;char, _Traits&gt; &amp;, const char *)</code><br>
@@ -144,10 +161,12 @@ dispatch(b);//绑定到spaceB::foo(spaceB::B &)
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://saltymilk-ini.github.io/blog/2025/09/23/C-ADL-%E4%B8%8E-%E6%A8%A1%E6%9D%BF/" data-id="cuidbJ36yFFfS1z78d_EV779Y" data-title="" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
+      <a data-url="https://saltymilk-ini.github.io/blog/2025/09/23/C-ADL-%E4%B8%8E-%E6%A8%A1%E6%9D%BF/" data-id="cuidkwxZ0osK07sDrwgcOitcx" data-title="C++ ADL 与 模板" class="article-share-link"><span class="fa fa-share">Teilen</span></a>
       
       
       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/HTML/" rel="tag">HTML</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Hexo/" rel="tag">Hexo</a></li></ul>
+
     </footer>
   </div>
   
@@ -171,12 +190,33 @@ dispatch(b);//绑定到spaceB::foo(spaceB::B &)
           <aside id="sidebar">
   
     
+  <div class="widget-wrap">
+    <h3 class="widget-title">Kategorien</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/blog/categories/%E6%8A%80%E6%9C%AF/">技术</a></li></ul>
+    </div>
+  </div>
+
 
   
     
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/HTML/" rel="tag">HTML</a></li><li class="tag-list-item"><a class="tag-list-link" href="/blog/tags/Hexo/" rel="tag">Hexo</a></li></ul>
+    </div>
+  </div>
+
 
   
     
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/blog/tags/HTML/" style="font-size: 10px;">HTML</a> <a href="/blog/tags/Hexo/" style="font-size: 10px;">Hexo</a>
+    </div>
+  </div>
+
   
     
   <div class="widget-wrap">
@@ -195,7 +235,7 @@ dispatch(b);//绑定到spaceB::foo(spaceB::B &)
       <ul>
         
           <li>
-            <a href="/blog/2025/09/23/C-ADL-%E4%B8%8E-%E6%A8%A1%E6%9D%BF/">(no title)</a>
+            <a href="/blog/2025/09/23/C-ADL-%E4%B8%8E-%E6%A8%A1%E6%9D%BF/">C++ ADL 与 模板</a>
           </li>
         
           <li>
