@@ -193,7 +193,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2025-09-23 16:00:00 / 修改时间：18:27:13" itemprop="dateCreated datePublished" datetime="2025-09-23T16:00:00+08:00">2025-09-23</time>
+      <time title="创建时间：2025-09-23 16:00:00 / 修改时间：18:28:04" itemprop="dateCreated datePublished" datetime="2025-09-23T16:00:00+08:00">2025-09-23</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -226,7 +226,7 @@ template&lt;class _Traits&gt;
 std::basic_ostream&lt;char, _Traits&gt; operator&lt;&lt;(std::basic_ostream&lt;char, _Traits&gt; &amp;, const char *)
 </code></pre>
 </details>
-<p>也就是说这个调用其实等价于 <code>operator&lt;&lt;(std::cout, "...")</code>，注意 <code>operator&lt;&lt;</code> 前并没有使用 <code>std::</code> 来指定查找位置，而这个对于 <code>std::operator&lt;&lt;</code> 的调用能顺利解析而不会触发 '没有与操作数匹配的操作符' 错误，正是由于 ADL 发挥了作用：第一个参数 <code>std::cout</code> 所在的命名空间 <code>std</code> 被加入到对 <code>operator&lt;&lt;</code> 的查找空间内，从而匹配到针对 <code>const char *</code> 的 </code>operator&lt;&lt;</code> 。</p>
+<p>也就是说这个调用其实等价于 <code>operator&lt;&lt;(std::cout, "...")</code>，注意 <code>operator&lt;&lt;</code> 前并没有使用 <code>std::</code> 来指定查找位置，而这个对于 <code>std::operator&lt;&lt;</code> 的调用能顺利解析而不会触发 '没有与操作数匹配的操作符' 错误，正是由于 ADL 发挥了作用：第一个参数 <code>std::cout</code> 所在的命名空间 <code>std</code> 被加入到对 <code>operator&lt;&lt;</code> 的查找空间内，从而匹配到针对 <code>const char *</code> 的 <code>operator&lt;&lt;</code> 。</p>
 <h1>ADL + 模板</h1>
 <p>当函数参数是模板时，查找空间会扩展到参数模板所在的命名空间以及模板实参的命名空间：</p>
 <details open>
