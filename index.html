@@ -193,7 +193,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2025-09-23 16:00:00 / 修改时间：18:21:19" itemprop="dateCreated datePublished" datetime="2025-09-23T16:00:00+08:00">2025-09-23</time>
+      <time title="创建时间：2025-09-23 16:00:00 / 修改时间：18:23:12" itemprop="dateCreated datePublished" datetime="2025-09-23T16:00:00+08:00">2025-09-23</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -221,12 +221,10 @@
 <p>我们常用的 <code>std::cout &lt;&lt; "..."</code> 其实就是一个 ADL 的例子。<code>std::cout</code>，查看一下 STL 的代码，它是 <code>std::basic_ostream&lt;char, std::char_traits&lt;char&gt;&gt;</code>，而这个类只定义了针对算术类型和指针类型的 <code>operator&lt;&lt;</code> 并没有定义针对 <code>const char *</code> 的版本，使用编译器的跳转功能跳转到 <code>&lt;&lt;</code> 的调用，其实是:</p>
 <details open>
 <summary>代码</summary>
-<pre>
-<code>
+<pre><code>
 template&lt;class _Traits&gt;
 std::basic_ostream&lt;char, _Traits&gt; operator&lt;&lt;(std::basic_ostream&lt;char, _Traits&gt; &amp;, const char *)
-</code>
-</pre>
+</code></pre>
 </details>
 <p>也就是说这个调用其实等价于 <code>operator&lt;&lt;(std::cout, "...")</code>，注意 operator<< 前并没有使用 std:: 来指定查找位置，而这个对于 <code>std::operator&lt;&lt;</code> 的调用能顺利解析而不会触发 '没有与操作数匹配的操作符' 错误，正是由于 ADL 发挥了作用：第一个参数 <code>std::cout</code> 所在的命名空间 std 被加入到对 <code>operator&lt;&lt;</code> 的查找空间内，从而匹配到针对 <code>const char *</code> 的 <code></code>operator&lt;&lt;</code> 。</p>
 <h1>ADL + 模板</h1>
