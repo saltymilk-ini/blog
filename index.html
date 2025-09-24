@@ -199,7 +199,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2025-09-24 15:43:55" itemprop="dateModified" datetime="2025-09-24T15:43:55+08:00">2025-09-24</time>
+      <time title="修改时间：2025-09-24 15:52:18" itemprop="dateModified" datetime="2025-09-24T15:52:18+08:00">2025-09-24</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -221,9 +221,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          
-<h1>什么是 ADL</h1>
-<p>ADL(Argument Dependent Lookup)，参数依赖查找，明确的意思是 <b>依赖参数的函数查找</b>，即对于函数调用，不仅会依照常规的名称查找规则，还会在函数参数所在的命名空间内查找。</p>
+          <h2 id="什么是-ADL"><a href="#什么是-ADL" class="headerlink" title="什么是 ADL"></a>什么是 ADL</h2><p>ADL(Argument Dependent Lookup)，参数依赖查找，明确的意思是 <b>依赖参数的函数查找</b>，即对于函数调用，不仅会依照常规的名称查找规则，还会在函数参数所在的命名空间内查找。</p>
 <p>我们常用的 <code>std::cout &lt;&lt; "..."</code> 其实就是一个 ADL 的例子。<code>std::cout</code>，查看一下 STL 的代码，它是 <code>std::basic_ostream&lt;char, std::char_traits&lt;char&gt;&gt;</code>，而这个类只定义了针对算术类型和指针类型的 <code>operator&lt;&lt;</code> 并没有定义针对 <code>const char *</code> 的版本，使用编译器的跳转功能跳转到 <code>&lt;&lt;</code> 的调用，其实是:</p>
 <details open>
 <summary>代码</summary>
@@ -233,7 +231,7 @@ std::basic_ostream&lt;char, _Traits&gt; operator&lt;&lt;(std::basic_ostream&lt;c
 </code></pre>
 </details>
 <p>也就是说这个调用其实等价于 <code>operator&lt;&lt;(std::cout, "...")</code>，注意 <code>operator&lt;&lt;</code> 前并没有使用 <code>std::</code> 来指定查找位置，而这个对于 <code>std::operator&lt;&lt;</code> 的调用能顺利解析而不会触发 '没有与操作数匹配的操作符' 错误，正是由于 ADL 发挥了作用：第一个参数 <code>std::cout</code> 所在的命名空间 <code>std</code> 被加入到对 <code>operator&lt;&lt;</code> 的查找空间内，从而匹配到针对 <code>const char *</code> 的 <code>std::operator&lt;&lt;</code>。</p>
-<h1>ADL + 模板</h1>
+## ADL + 模板
 <p>当函数参数是模板时，查找空间会扩展到参数模板所在的命名空间以及模板实参的命名空间：</p>
 <details open>
 <summary>代码</summary>
@@ -252,7 +250,7 @@ TpB&lt;space::A&gt; tba;
 foo(tba);//通过A找到foo
 </code></pre>
 </details>
-<h1>根据模板实参自动选择调用函数</h1>
+## 根据模板实参自动选择调用函数
 <p>ADL + 模板很容易就能实现根据模板实参调用不同函数的功能：</p>
 <details open>
 <summary>代码</summary>
