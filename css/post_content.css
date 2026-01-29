@@ -1,0 +1,318 @@
+.main-area h1 {
+    font-size: 22px;
+    color: #33587c;
+    font-weight: bold;
+    border-bottom: 2px solid rgba(52, 152, 219, 0.2);
+    padding-bottom: 5px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.main-area h2 {
+    font-size: 20px;
+    color: #33587c;
+    font-weight: bold;
+    border-left: 4px solid #3498db;
+    padding-left: 10px;
+    margin-top: 25px;
+    margin-bottom: 12px;
+}
+
+.main-area h3 {
+    font-size: 18px;
+    color: #33587c;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.main-area p {
+    font-size: 16px;
+    color: #333;
+    line-height: 1.5;
+    text-align: justify;
+    text-justify: inter-ideograph;
+    text-indent: 2em;
+}
+
+.main-area p.hanging-indent {
+    text-indent: -2em;
+    padding-left: 2em;
+    margin-left: 0;
+}
+
+.main-area p.whole-indent {
+    text-indent: 2em;
+    padding-left: 2em;
+    margin-left: 0;
+}
+
+.main-area p.tip-paragraph {
+    text-indent: 0em;
+    font-size: 12px;
+    color: purple;
+    background-color: rgba(50, 50, 50, 0.1);
+    border-left: 3px solid purple;
+    border-radius: 3px;
+    padding: 2px 5px 2px 5px;
+}
+
+.main-area div.image {
+    display: flex;
+    vertical-align: middle;
+    justify-content: center;
+    align-items: center;
+}
+
+.main-area span.highlight {
+    font-size: 16px;
+    color: #e74c3c;
+    font-weight: bold;
+    background: rgba(231, 76, 60, 0.1);
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+.main-area span.highlight-red {
+    font-size: 16px;
+    color: #e74c3c;
+    font-weight: bold;
+    background: rgba(231, 76, 60, 0.1);
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+.main-area span.highlight-blue {
+    font-size: 16px;
+    color: #3498db;
+    font-weight: bold;
+    background: rgba(52, 152, 219, 0.1);
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+.main-area span.highlight-green {
+    font-size: 16px;
+    color: #27ae60;
+    font-weight: bold;
+    background: rgba(39, 174, 96, 0.1);
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+.main-area span.highlight-orange {
+    font-size: 16px;
+    color: #f39c12;
+    font-weight: bold;
+    background: rgba(243, 156, 18, 0.1);
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+.main-area span.highlight-purple {
+    font-size: 16px;
+    color: #9b59b6;
+    font-weight: bold;
+    background: rgba(155, 89, 182, 0.1);
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+.main-area span.highlight-important {
+    font-size: 16px;
+    color: #e74c3c;
+    font-weight: bold;
+    background: rgba(231, 76, 60, 0.1);
+    padding: 3px 6px;
+    border-radius: 4px;
+    border-left: 3px solid #e74c3c;
+    position: relative;
+}
+
+.main-area span.highlight-important::before {
+    content: "⚠ ";
+    font-weight: bold;
+}
+
+.main-area span.highlight-tip {
+    font-size: 16px;
+    color: #27ae60;
+    font-weight: bold;
+    background: rgba(39, 174, 96, 0.1);
+    padding: 3px 6px;
+    border-radius: 4px;
+    border-left: 3px solid #27ae60;
+}
+
+.main-area span.highlight-tip::before {
+    content: "💡 ";
+}
+
+.main-area span.highlight-note {
+    font-size: 14px;
+    color: #3498db;
+    background: rgba(52, 152, 219, 0.1);
+    padding: 3px 6px;
+    border-radius: 4px;
+    border-left: 3px solid #3498db;
+}
+
+.main-area span.highlight-note::before {
+    content: "📝 ";
+}
+
+.main-area span.highlight-book {
+    font-size: 16px;
+    color: #e67e22;
+    background: rgba(231, 76, 60, 0.1);
+    border-radius: 3px;
+    position: relative;
+}
+
+.main-area span.highlight-book::before {
+    content: "📔 ";
+}
+
+.main-area .highlight:hover,
+.main-area span.highlight:hover,
+.main-area .highlight-red:hover,
+.main-area .highlight-blue:hover,
+.main-area .highlight-green:hover,
+.main-area .highlight-orange:hover,
+.main-area .highlight-purple:hover {
+    transform: scale(1.05);
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* ==================== 其他统一样式继续 ==================== */
+
+.main-area ul,
+.main-area ol {
+    font-size: 16px;
+    color: #333;
+    line-height: 1.8;
+    margin-bottom: 15px;
+}
+
+.main-area li {
+    margin-bottom: 5px;
+}
+
+.main-area blockquote {
+    font-size: 15px;
+    color: #666;
+    background: #f8f9fa;
+    border-left: 4px solid #3498db;
+    padding: 10px 15px;
+    margin: 20px 0;
+    font-style: italic;
+}
+
+.main-area code {
+    background-color: rgba(27, 31, 35, 0.05);
+    color: #d63384;
+    border-radius: 2px;
+    padding: 0px 2px 0px 2px;
+    font-size: 14px;
+    text-indent: 0em;
+    font-family: "Consolas", "Courier New", monospace;
+}
+
+.main-area pre {
+    margin: 0;
+    background: rgb(50, 50, 50);
+    border: 1px solid darkgoldenrod;
+    border-radius: 3px;
+}
+
+.main-area pre code {
+    margin: 0;
+    font-size: 14px;
+    font-family: "Consolas", "Courier New", monospace;
+}
+
+.main-area pre code span.tip-code {
+    color: purple;
+}
+
+.main-area details {
+    border: none;
+    margin: 5px 0 5px 0;
+}
+
+.main-area details summary {
+    background-color: rgba(231, 76, 60, 0.2);
+    font-size: 12px;
+    color: #586069;
+    border: none;
+    border-radius: 2px;
+    outline: none;
+    padding: 1px 0 1px 5px;
+}
+
+.main-area details[open] summary::before {
+    content: "点击收起";
+}
+
+.main-area details:not([open]) summary::before {
+    content: "点击展开";
+}
+
+.main-area a {
+    color: #3498db;
+    text-decoration: underline;
+}
+
+.main-area a:hover {
+    color: #5500bb;
+    text-decoration: underline;
+}
+
+.main-area .highlight a,
+.main-area .highlight-red a,
+.main-area .highlight-blue a,
+.main-area .highlight-green a,
+.main-area .highlight-orange a,
+.main-area .highlight-purple a {
+    color: inherit;
+}
+
+@media (max-width: 768px) {
+    #blogTitle h1 {
+        font-size: 24px;
+    }
+
+    .postTitle {
+        font-size: 20px;
+    }
+
+    .main-area {
+        font-size: 15px;
+    }
+
+    .main-area h1 {
+        font-size: 20px;
+    }
+
+    .main-area h2 {
+        font-size: 18px;
+    }
+
+    .main-area h3 {
+        font-size: 16px;
+    }
+
+    .main-area .highlight,
+    .main-area .highlight-red,
+    .main-area .highlight-blue,
+    .main-area .highlight-green,
+    .main-area .highlight-orange,
+    .main-area .highlight-purple {
+        font-size: 16px;
+    }
+
+    .main-area .highlight-large {
+        font-size: 18px;
+    }
+}

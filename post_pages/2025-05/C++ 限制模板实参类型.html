@@ -1,0 +1,137 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>C++ 限制模板实参类型</title><link rel="stylesheet" href="../../css/post_content.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css"><link rel="stylesheet" href="../../css/common.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script></head><body><div class="page-title">C++ 限制模板实参类型</div><div class="container"><main class="main-area"><p>有时候我们编写一个模板，希望用户使用我们期望的类型来实例化它，就需要对实参进行检查，限制不满足条件的实例化版本，同时给出便于理解的编译时信息。</p>
+<p>对于 C++20 后的版本，可以将条件包装为concept：</p>
+<details open>
+<summary>代码</summary>
+<pre><code>template&lt;typename T&gt;
+concept check = requires(T t)
+{
+  T{};//可以默认构造
+  typename T::value_type;//定义了value_type类型名
+  t.x;//具有名为x的成员变量
+  t.set(1);//具有名为set的成员函数，并且可以使用(int)1调用
+};<br>
+struct A//完全满足所有要求
+{
+  typedef float value_type;
+  value_type x;
+  void set(value_type _x){}//concept检查接口调用时接受int到float的隐式转换
+};<br>;
+struct B//无默认构造函数
+{
+  typedef int value_type;
+  value_type x;
+  B(int _x):x(_x){}
+  void set(value_type _x){}
+};<br>
+struct C//没有定义value_type类型名
+{
+  int x;
+  void set(int _x){}
+};<br>
+struct D//没有名为x的数据成员
+{
+  typedef int value_type;
+  void set(value_type _x){}
+};<br>
+struct E//没有名为set的成员函数
+{
+  typedef int value_type;
+  value_type x;
+};<br>
+template&lt;check T&gt;
+struct tp1{};<br>
+tp1&lt;A&gt; a;//OK
+tp1&lt;B&gt; b;//错误，无默认构造函数可用
+tp1&lt;C&gt; c;//错误，value_type未定义
+tp1&lt;D&gt; d;//错误，x不是D的成员
+tp1&lt;E&gt; e;//错误，set不是E的成员
+</code></pre>
+</details>
+<p>通过concept可以方便的包装条件，并且在编译时给出相对易于理解的错误信息，但是如果我们的编译环境不支持 C++20，这些检查的实现就会颇为复杂：</p>
+<details open>
+<summary>代码</summary>
+<pre><code class="language-cpp">
+#define DETECT_TYPE_DEFINITION(name)                                                                     \
+template&lt;typename T, typename = void&gt;                                                                    \
+struct detect_type_definition_##name##_impl : std::false_type {};                                        \
+template&lt;typename T&gt;                                                                                     \
+struct detect_type_definition_##name##_impl&lt;T, std::void_t&lt;typename T::name&gt;&gt; : std::true_type {};       \
+template&lt;typename T&gt;                                                                                     \
+constexpr bool has_type_definition_##name = detect_type_definition_##name##_impl&lt;T&gt;::value;<br>
+//《C++ Templates》中讲到的方法，impl函数利用 SFINAE 特性，只用作返回值类型推导，无需函数体
+#define DETECT_MEMBER(name)                                                                              \
+  template&lt;typename T&gt;                                                                                   \
+  constexpr auto detect_member_##name##_impl(int) -&gt; decltype(std::declval&lt;T&gt;().name, std::true_type{}); \
+  template&lt;typename&gt;                                                                                     \
+  constexpr auto detect_member_##name##_impl(...) -&gt; std::false_type;                                    \
+  template&lt;typename T&gt;                                                                                   \
+  constexpr bool has_member_##name = decltype(detect_member_##name##_impl&lt;T&gt;(0))::value;<br>
+#define DETECT_MEMBER_FUNC(name)                                                                         \
+  template&lt;typename T, typename... Args&gt;                                                                 \
+  constexpr auto detect_member_func_##name##_impl(int) -&gt;                                                \
+    decltype(std::declval&lt;T&gt;().name(std::declval&lt;Args&gt;()...), std::true_type{});                         \
+  template&lt;typename, typename...&gt;                                                                        \
+  constexpr auto detect_member_func_##name##_impl(...) -&gt; std::false_type;                               \
+  template&lt;typename T, typename... Args&gt;                                                                 \
+  constexpr bool has_member_func_##name =                                                                \
+    decltype(detect_member_func_##name##_impl&lt;T, Args...&gt;(0))::value;<br>
+//使用宏可以方便地扩展到不同名称的成员检测上，便于复用
+DETECT_TYPE_DEFINITION(value_type);//生成对名为value_type的类型定义的检测模板
+DETECT_MEMBER(x);//生成对名为x的成员变量的检测模板
+DETECT_MEMBER_FUNC(set);//生成对名为成员函数set的检测模板<br>
+//辅助检测基类
+template&lt;typename T&gt;
+struct check
+{
+  static_assert(std::is_default_constructible&lt;T&gt;::value, "no default constructor");//是否可以默认构造
+  static_assert(has_type_definition_value_type&lt;T&gt;, "no definition of 'value_type'");//是否定义了value_type类型名
+  static_assert(has_member_x&lt;T&gt;, "no member named 'x'");//是否有名为x的成员
+  static_assert(has_member_func_set&lt;T, int&gt;, "no member function named 'set' or "
+    "the member function 'set' can not be called with an integer");//是否有名为set，并且可用int调用的成员函数
+};<br>
+template&lt;typename T /*, typename trigger_check = check&lt;T&gt;若tp2内未使用check&lt;T&gt;，check&lt;T&gt;的实例化将会被跳过*/&gt;
+struct tp2: check&lt;T&gt;//继承自check以保证check被实例化
+{
+  //using trigger_check = check&lt;T&gt;;//同默认模板实参一样，可能由于惰性实例化而跳过
+};<br>
+//类A、B、C、D、E为先前的定义
+tp2&lt;A&gt; a;//OK
+tp2&lt;B&gt; b;//错误，no default constructor
+tp2&lt;C&gt; c;//错误，no definition of 'value_type'
+tp2&lt;D&gt; d;//错误，no member named 'x'
+tp2&lt;E&gt; e;//错误，no member function named 'set' or the member function 'set' can not be called with an integer
+</code></pre>
+</details>
+<p>通过继承（代码注释中已解释为什么不用默认模板实参和类型别名）可以将检查条件封装于基类中，使用静态断言，可在发生编译错误时提供可读性更高的错误提示。
+在多个模板类都需要相同的实参约束条件时，将约束条件收集到基类中可以增加代码复用性，减少搬砖性质的劳动。例如在编写几何类库时，很多类都要求使用算术类型来实例化：</p>
+<details open>
+<summary>代码</summary>
+<pre><code>template&lt;typename T&gt;
+struct arithmetic_check
+{
+  static_assert(std::is_arithmetic&lt;T&gt;::value, "instanciation requires arithmetic types");
+};<br>
+template&lt;typename T&gt;
+class point : arithmetic_check&lt;T&gt; {...};
+template&lt;typename T&gt;
+class rect : arithmetic_check&lt;T&gt; {...};
+template&lt;typename T&gt;
+class line_segment : arithmetic_check&lt;T&gt; {...};
+...
+</code></pre>
+</details>
+<p>若通用条件无法满足需求，可以通过继承扩充条件约束：</p>
+<details open>
+<summary>代码</summary>
+<pre><code>//不仅需要算术类型，还要求是有符号
+template&lt;typename T&gt;
+struct signed_check : arithmetic_check&lt;T&gt;
+{
+  static_assert(std::is_signed&lt;T&gt;::value, "instanciation requires signed arithmetic types");
+};
+template&lt;typename T&gt;
+class real_point : signed_check&lt;T&gt; {...};
+</code></pre>
+</details>
+<p>上述简单例子有些故意为之，但是足以展示编码思路。
+由于所有的条件约束类都不存在非静态数据成员，编译器可以针对它们启用空基类优化策略（<a href="https://zh.cppreference.com/w/cpp/language/ebo" target="_blank">EBCO，Empty Base Class Optimization</a>），不会增加内存占用。</p></main></div><script>hljs.highlightAll();</script></body></html>
