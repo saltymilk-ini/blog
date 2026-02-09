@@ -1,6 +1,6 @@
 body {
     display: block;
-    font-family: Arial, sans-serif;
+    /* font-family: Arial, sans-serif; */
     min-width: 640px;
     margin: 0 auto;
     padding: 10px;
@@ -8,19 +8,20 @@ body {
 
 .page-title {
     font-size: 2em;
-    height: 40px;
-    padding: 10px;
+    height: 60px;
     font: bold;
+    text-align: center;
+    align-content: center;
     white-space: nowrap;
     box-shadow: 5px 5px 5px lightgray;
     color: white;
-    background-color: darkgoldenrod;
+    background-color: rgb(19, 79, 136);
 }
 
 .page-subtitle {
     font-size: 1.5em;
     margin-top: 5px;
-    padding-left: 15px;
+    text-align: center;
     font: bold;
 }
 
@@ -45,14 +46,18 @@ li {
     flex: 3;
     min-width: 30rem;
     max-width: 66rem;
-    /* background-color: #e7e9e7; */
     padding: 10px;
     overflow: hidden;
 }
 
 .side-bar {
     flex: 1;
+    min-width: 15rem;
+    max-width: 20rem;
     background-color: #e0dbc5;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border-radius: 3px;
     padding: 10px;
     overflow: hidden;
 }
@@ -60,4 +65,10 @@ li {
 .side-bar-title {
     font-size: 16px;
     border-bottom: 2px solid grey;
+}
+
+.navigate-text{
+    padding-top: 10px;
+    padding-bottom: 10px;
+    text-align: center;
 }

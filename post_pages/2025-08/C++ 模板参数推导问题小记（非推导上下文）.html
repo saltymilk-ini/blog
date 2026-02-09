@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>C++ 模板参数推导问题小记（非推导上下文）</title><link rel="stylesheet" href="../../css/post_content.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css"><link rel="stylesheet" href="../../css/common.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script></head><body><div class="page-title">C++ 模板参数推导问题小记（非推导上下文）</div><div class="container"><main class="main-area"><p>最近遇到一个模板参数推导的问题，代码如下：</p>
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>C++ 模板参数推导问题小记（非推导上下文）</title><link rel="stylesheet" href="../../css/post_content.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css"><link rel="stylesheet" href="../../css/common.css"><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script><script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script src="../../js/highlight_tip_code.js"></script></head><body><div class="page-title">C++ 模板参数推导问题小记（非推导上下文）</div><div class="container"><main class="main-area"><div class="navigate-text"><a href="../2025-08/C++ 使用分治减小模板递归深度.html">上一篇</a> <a href="../../index.html">返回首页</a> <a href="../2025-07/C++ 习惯RAII思想.html">下一篇</a></div><p>最近遇到一个模板参数推导的问题，代码如下：</p>
 <details open>
 <summary>代码</summary>
 <pre><code>template&lt;typename T&gt;
@@ -161,4 +161,4 @@ using selected_type = decltype(selected_type_impl&lt;T&gt;(0));
 <img src="../../images/19013086//3635299-20250804172536793-637183567.webp" alt="grok">
 </div>
 <p>这四个都没有完全分析正确，这让我有一点意外。清除聊天上下文后拿相同的问题再提问，它们每次几乎都会给出不一样的结论，偶尔能正确地预测。持续聊天并引导它们分析问题，它们中很少能够准确说出问题出在非推导上下文这个点上。</p>
-<p>这很难让人完全放心的将代码完全交由 AI 编写，目前来看，使用它们咨询一些编码问题，从中得到启发并亲自确认或者深入研究才是比较稳妥的做法。</p></main></div><script>hljs.highlightAll();</script></body></html>
+<p>这很难让人完全放心的将代码完全交由 AI 编写，目前来看，使用它们咨询一些编码问题，从中得到启发并亲自确认或者深入研究才是比较稳妥的做法。</p><div class="navigate-text"><a href="../2025-08/C++ 使用分治减小模板递归深度.html">上一篇</a> <a href="../../index.html">返回首页</a> <a href="../2025-07/C++ 习惯RAII思想.html">下一篇</a></div></main></div><script>hljs.highlightAll();highlight_tip_code();</script></body></html>
