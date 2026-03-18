@@ -1,9 +1,8 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>使用 C++ 模拟 ShaderLanguage 的 swizzle</title><link rel="stylesheet" href="../../css/common.css"><link rel="stylesheet" href="../../css/post_content.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css"><script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script src="../../js/highlight_tip_code.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script></head><body><div class="page-title">使用 C++ 模拟 ShaderLanguage 的 swizzle</div><div class="container"><main class="main-area"><div class="navigate-text"> <a href="../../index.html">返回首页</a> <a href="../2025-12/C++ 语言特性的变更可能让你的防御成为马奇诺防线.html">下一篇</a></div><h1>swizzle 语法</h1>
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>使用 C++ 模拟 ShaderLanguage 的 swizzle</title><link rel="stylesheet" href="../../css/post_content.css"><link rel="stylesheet" href="../../css/common.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script><script src="../../js/highlight_tip_code.js"></script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script><script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script></head><body><div class="page-title">使用 C++ 模拟 ShaderLanguage 的 swizzle</div><div class="container"><main class="main-area"><div class="navigate-text"> <a href="../../index.html">返回首页</a> <a href="../2025-12/C++ 语言特性的变更可能让你的防御成为马奇诺防线.html">下一篇</a></div><h1>swizzle 语法</h1>
 <p>经常编写着色器的同学应该对 swizzle（重排）语法非常熟悉，方便又灵活，可以说是用过一次便回味无穷。</p>
 <details open>
 <summary>代码</summary>
-<pre><code class="language-cpp">
-vec4 color = vec4(1.0, 0.5, 0.0, 1.0);
+<pre><code class="language-cpp">vec4 color = vec4(1.0, 0.5, 0.0, 1.0);
 vec3 rgb = color.rgb;        // { 1.0, 0.5, 0.0 }
 vec2 xy = color.xy;          // { 1.0, 0.5 }
 vec4 bgra = color.bgra;      // { 0.0, 0.5, 1.0, 1.0 }
@@ -15,9 +14,9 @@ vec4 bgra = color.bgra;      // { 0.0, 0.5, 1.0, 1.0 }
 <p>作为图形编程中的常客，<a href="https://glm.g-truc.net/0.9.8/index.html" target="_blank" rel="noopener">GLM</a> 提供了一套和 GLSL 相似的 swizzle 语法，只需要在使用前定义宏 GLM_FORCE_SWIZZLE 即可在向量类中使用了:</p>
 <details open>
 <summary>代码</summary>
-<pre><code class="language-cpp">
-#define GLM_FORCE_SWIZZLE
-#include &ltglm/glm.hpp&gt<br>
+<pre><code class="language-cpp">#define GLM_FORCE_SWIZZLE
+#include &ltglm/glm.hpp&gt
+
 glm::vec3 v{1.0f, 2.0f, 3.0f};
 v.xy = v.yz;
 glm::vec3 reverse = v.zyx;
@@ -35,7 +34,7 @@ $$
 N=\sum_{i=2}^{4} 3^i=117 \\
 \end{aligned}
 $$
-<p>也就是说在 glm::vec3 的类定义中会有 117 个类似于 xx, xy, xxx, xyz, xxxx, zyzw 这样的成员（位于未命名 union 内）。虽然它们共用同一块内存，不会增加类的大小，但是代码编辑器的智能补全会将它们一一列举出来，这会让其他的成员变量、函数淹没在这些符号之间，体验上多少有点不好：</p>
+<p>也就是说在 glm::vec3 的类定义中会有 117 个类似于 xx, xy, xxx, xyz, xxxx, xyzw 这样的成员（位于未命名 union 内）。虽然它们共用同一块内存，不会增加类的大小，但是代码编辑器的智能补全会将它们一一列举出来，这会让其他的成员变量、函数淹没在这些符号之间，体验上多少有点不好：</p>
 <div class="image">
 <img src="../../images/19690742//3635299-20260310144050392-1795627200.gif" alt="">
 </div>
@@ -44,8 +43,7 @@ $$
 <p>Eigen 并没有直接提供 swizzle 语法，但是它的 IndexedView 提供类似的功能：</p>
 <details open>
 <summary>代码</summary>
-<pre><code class="language-cpp">
-Eigen::Vector3f v{ 1.0f, 2.0f, 3.0f };
+<pre><code class="language-cpp">Eigen::Vector3f v{ 1.0f, 2.0f, 3.0f };
 //swz 类型是 Eigen::IndexedView&ltEigen::Vector3f, Eigen::Array&ltint, 2, 1&gt, Eigen::internal::SingleRange&lt0&gt&gt
 auto swz = v({1, 0});
 swz = Eigen::Vector2f{4.0f, 5.0f}; 
@@ -55,8 +53,7 @@ v({0, 1, 2}) = v({2, 0, 1}); //相当于 v.xyz = v.zxy
 <p>我没有细看 Eigen 的源码，但是表面上猜测，IndexedView 类的实现思路基本上也是一种代理的思想，并且它应该将绑定数据的引用和位置信息都保存在了类的数据成员中：</p>
 <details open>
 <summary>代码</summary>
-<pre><code class="language-cpp">
-Eigen::Vector3f v{ 1.0f, 2.0f, 3.0f };
+<pre><code class="language-cpp">Eigen::Vector3f v{ 1.0f, 2.0f, 3.0f };
 constexpr int swz2_size = sizeof(v({0, 1}));                //24 byte
 constexpr int swz3_size = sizeof(v({0, 1, 2}));             //24 byte
 constexpr int swz4_size = sizeof(v({0, 0, 1, 2}));          //48 byte
@@ -75,6 +72,6 @@ constexpr int swz6_size = sizeof(v({0, 0, 1, 1, 2, 2}));    //40 byte
 <h1>总结</h1>
 <p>在实现完 point 类之后，我才发现 GLM 和 Eigen 中的类似功能实现，又是一次重复造轮子。但是还是颇有收获的，想当初入门 C++ 时看到模板代码就头疼，现在不管多复杂的库代码也能慢慢剖开分析实现思路，其中很多技巧都是在一次次造轮子中深入掌握的。</p>
 <p>总结一下各个实现版本的特点吧：</p>
-<p>GLM: 完美还原着色器的 swizzle 语法，但组合是固定的；</p>
-<p>Eigen: 支持任意的重排操作，但没有语法上的封装；</p>
-<p>我的实现：支持任意的重排操作，但没有完全还原着色器语法。</p><div class="navigate-text"> <a href="../../index.html">返回首页</a> <a href="../2025-12/C++ 语言特性的变更可能让你的防御成为马奇诺防线.html">下一篇</a></div></main></div><script>highlight_tip_code();hljs.highlightAll();</script></body></html>
+<p>GLM: swizzle 组合作为成员定义在类内，完美还原着色器语法，但组合是固定的；</p>
+<p>Eigen: 通用的代理类，支持任意的重排操作，但没有语法上的封装；</p>
+<p>我的实现：swizzle 作为返回代理类的成员函数，支持任意的重排操作，但没有完全还原着色器语法。</p><div class="navigate-text"> <a href="../../index.html">返回首页</a> <a href="../2025-12/C++ 语言特性的变更可能让你的防御成为马奇诺防线.html">下一篇</a></div></main></div><script>highlight_tip_code();hljs.highlightAll();</script></body></html>

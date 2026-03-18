@@ -1,27 +1,35 @@
 body {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     /* font-family: Arial, sans-serif; */
     min-width: 640px;
     margin: 0 auto;
     padding: 10px;
+    background-color: darkgray;
 }
 
 .page-title {
-    font-size: 2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
     height: 60px;
+    font-size: 2em;
     font: bold;
-    text-align: center;
-    align-content: center;
     white-space: nowrap;
-    box-shadow: 5px 5px 5px lightgray;
+    box-shadow: 2px 2px 2px darkblue;
     color: white;
     background-color: rgb(19, 79, 136);
 }
 
 .page-subtitle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 45px;
     font-size: 1.5em;
-    margin-top: 5px;
-    text-align: center;
     font: bold;
 }
 
@@ -39,6 +47,9 @@ li {
     justify-content: center;
     overflow: hidden;
     margin-top: 15px;
+    padding-left: 10px;
+    padding-right: 20px;
+    width: fit-content;
     background-color: #e7e9e7;
 }
 

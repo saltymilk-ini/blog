@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>C++ 限制模板实参类型</title><link rel="stylesheet" href="../../css/common.css"><link rel="stylesheet" href="../../css/post_content.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css"><script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script src="../../js/highlight_tip_code.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script></head><body><div class="page-title">C++ 限制模板实参类型</div><div class="container"><main class="main-area"><div class="navigate-text"><a href="../2025-05/C++ 智能指针的删除器.html">上一篇</a> <a href="../../index.html">返回首页</a> <a href="../2025-04/C++ ADL 与 模板.html">下一篇</a></div><p>有时候我们编写一个模板，希望用户使用我们期望的类型来实例化它，就需要对实参进行检查，限制不满足条件的实例化版本，同时给出便于理解的编译时信息。</p>
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>C++ 限制模板实参类型</title><link rel="stylesheet" href="../../css/post_content.css"><link rel="stylesheet" href="../../css/common.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script><script src="../../js/highlight_tip_code.js"></script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script><script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script></head><body><div class="page-title">C++ 限制模板实参类型</div><div class="container"><main class="main-area"><div class="navigate-text"><a href="../2025-05/C++ 智能指针的删除器.html">上一篇</a> <a href="../../index.html">返回首页</a> <a href="../2025-04/C++ ADL 与 模板.html">下一篇</a></div><p>有时候我们编写一个模板，希望用户使用我们期望的类型来实例化它，就需要对实参进行检查，限制不满足条件的实例化版本，同时给出便于理解的编译时信息。</p>
 <p>对于 C++20 后的版本，可以将条件包装为concept：</p>
 <details open>
 <summary>代码</summary>
@@ -9,37 +9,44 @@ concept check = requires(T t)
   typename T::value_type;//定义了value_type类型名
   t.x;//具有名为x的成员变量
   t.set(1);//具有名为set的成员函数，并且可以使用(int)1调用
-};<br>
+};
+
 struct A//完全满足所有要求
 {
   typedef float value_type;
   value_type x;
   void set(value_type _x){}//concept检查接口调用时接受int到float的隐式转换
-};<br>;
+};
+;
 struct B//无默认构造函数
 {
   typedef int value_type;
   value_type x;
   B(int _x):x(_x){}
   void set(value_type _x){}
-};<br>
+};
+
 struct C//没有定义value_type类型名
 {
   int x;
   void set(int _x){}
-};<br>
+};
+
 struct D//没有名为x的数据成员
 {
   typedef int value_type;
   void set(value_type _x){}
-};<br>
+};
+
 struct E//没有名为set的成员函数
 {
   typedef int value_type;
   value_type x;
-};<br>
+};
+
 template&lt;check T&gt;
-struct tp1{};<br>
+struct tp1{};
+
 tp1&lt;A&gt; a;//OK
 tp1&lt;B&gt; b;//错误，无默认构造函数可用
 tp1&lt;C&gt; c;//错误，value_type未定义
@@ -50,14 +57,14 @@ tp1&lt;E&gt; e;//错误，set不是E的成员
 <p>通过concept可以方便的包装条件，并且在编译时给出相对易于理解的错误信息，但是如果我们的编译环境不支持 C++20，这些检查的实现就会颇为复杂：</p>
 <details open>
 <summary>代码</summary>
-<pre><code class="language-cpp">
-#define DETECT_TYPE_DEFINITION(name)                                                                     \
+<pre><code class="language-cpp">#define DETECT_TYPE_DEFINITION(name)                                                                     \
 template&lt;typename T, typename = void&gt;                                                                    \
 struct detect_type_definition_##name##_impl : std::false_type {};                                        \
 template&lt;typename T&gt;                                                                                     \
 struct detect_type_definition_##name##_impl&lt;T, std::void_t&lt;typename T::name&gt;&gt; : std::true_type {};       \
 template&lt;typename T&gt;                                                                                     \
-constexpr bool has_type_definition_##name = detect_type_definition_##name##_impl&lt;T&gt;::value;<br>
+constexpr bool has_type_definition_##name = detect_type_definition_##name##_impl&lt;T&gt;::value;
+
 //《C++ Templates》中讲到的方法，impl函数利用 SFINAE 特性，只用作返回值类型推导，无需函数体
 #define DETECT_MEMBER(name)                                                                              \
   template&lt;typename T&gt;                                                                                   \
@@ -65,7 +72,8 @@ constexpr bool has_type_definition_##name = detect_type_definition_##name##_impl
   template&lt;typename&gt;                                                                                     \
   constexpr auto detect_member_##name##_impl(...) -&gt; std::false_type;                                    \
   template&lt;typename T&gt;                                                                                   \
-  constexpr bool has_member_##name = decltype(detect_member_##name##_impl&lt;T&gt;(0))::value;<br>
+  constexpr bool has_member_##name = decltype(detect_member_##name##_impl&lt;T&gt;(0))::value;
+
 #define DETECT_MEMBER_FUNC(name)                                                                         \
   template&lt;typename T, typename... Args&gt;                                                                 \
   constexpr auto detect_member_func_##name##_impl(int) -&gt;                                                \
@@ -74,11 +82,13 @@ constexpr bool has_type_definition_##name = detect_type_definition_##name##_impl
   constexpr auto detect_member_func_##name##_impl(...) -&gt; std::false_type;                               \
   template&lt;typename T, typename... Args&gt;                                                                 \
   constexpr bool has_member_func_##name =                                                                \
-    decltype(detect_member_func_##name##_impl&lt;T, Args...&gt;(0))::value;<br>
+    decltype(detect_member_func_##name##_impl&lt;T, Args...&gt;(0))::value;
+
 //使用宏可以方便地扩展到不同名称的成员检测上，便于复用
 DETECT_TYPE_DEFINITION(value_type);//生成对名为value_type的类型定义的检测模板
 DETECT_MEMBER(x);//生成对名为x的成员变量的检测模板
-DETECT_MEMBER_FUNC(set);//生成对名为成员函数set的检测模板<br>
+DETECT_MEMBER_FUNC(set);//生成对名为成员函数set的检测模板
+
 //辅助检测基类
 template&lt;typename T&gt;
 struct check
@@ -88,12 +98,14 @@ struct check
   static_assert(has_member_x&lt;T&gt;, "no member named 'x'");//是否有名为x的成员
   static_assert(has_member_func_set&lt;T, int&gt;, "no member function named 'set' or "
     "the member function 'set' can not be called with an integer");//是否有名为set，并且可用int调用的成员函数
-};<br>
+};
+
 template&lt;typename T /*, typename trigger_check = check&lt;T&gt;若tp2内未使用check&lt;T&gt;，check&lt;T&gt;的实例化将会被跳过*/&gt;
 struct tp2: check&lt;T&gt;//继承自check以保证check被实例化
 {
   //using trigger_check = check&lt;T&gt;;//同默认模板实参一样，可能由于惰性实例化而跳过
-};<br>
+};
+
 //类A、B、C、D、E为先前的定义
 tp2&lt;A&gt; a;//OK
 tp2&lt;B&gt; b;//错误，no default constructor
@@ -110,7 +122,8 @@ tp2&lt;E&gt; e;//错误，no member function named 'set' or the member function 
 struct arithmetic_check
 {
   static_assert(std::is_arithmetic&lt;T&gt;::value, "instanciation requires arithmetic types");
-};<br>
+};
+
 template&lt;typename T&gt;
 class point : arithmetic_check&lt;T&gt; {...};
 template&lt;typename T&gt;

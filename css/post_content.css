@@ -217,6 +217,7 @@
     font-size: 14px;
     text-indent: 0em;
     font-family: "Consolas", "Courier New", monospace;
+    white-space: pre;
 }
 
 .main-area pre {
@@ -229,7 +230,6 @@
 .main-area pre code {
     margin: 0;
     font-size: 14px;
-    font-family: "Consolas", "Courier New", monospace;
 }
 
 .main-area pre code span.tip-code {

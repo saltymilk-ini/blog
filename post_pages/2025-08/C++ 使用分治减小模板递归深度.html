@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>C++ 使用分治减小模板递归深度</title><link rel="stylesheet" href="../../css/common.css"><link rel="stylesheet" href="../../css/post_content.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css"><script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script src="../../js/highlight_tip_code.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script></head><body><div class="page-title">C++ 使用分治减小模板递归深度</div><div class="container"><main class="main-area"><div class="navigate-text"><a href="../2025-09/C++ 模板参数推导问题小记（模板类的模板构造函数）.html">上一篇</a> <a href="../../index.html">返回首页</a> <a href="../2025-08/C++ 模板参数推导问题小记（非推导上下文）.html">下一篇</a></div><h1>起因</h1>
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>C++ 使用分治减小模板递归深度</title><link rel="stylesheet" href="../../css/post_content.css"><link rel="stylesheet" href="../../css/common.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script><script src="../../js/highlight_tip_code.js"></script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script><script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script></head><body><div class="page-title">C++ 使用分治减小模板递归深度</div><div class="container"><main class="main-area"><div class="navigate-text"><a href="../2025-09/C++ 模板参数推导问题小记（模板类的模板构造函数）.html">上一篇</a> <a href="../../index.html">返回首页</a> <a href="../2025-08/C++ 模板参数推导问题小记（非推导上下文）.html">下一篇</a></div><h1>起因</h1>
 <p>C++14 引入 STL 的 make_index_sequence 可以生成一个类型为 std::size_t，0 到 N-1 的编译期序列，我们可以这样使用它：</p>
 <details open>
 <summary>代码</summary>
@@ -7,7 +7,8 @@ template&lt;std::size_t... Seq&gt;
 void foo(std::index_sequence&lt;Seq...&gt;)
 {
     //使用Seq
-}<br>
+}
+
 //利用模板特化提取序列
 template&lt;typename&gt;
 struct extract_sequence;
@@ -15,7 +16,8 @@ template&lt;std::size_t... Seq&gt;
 struct extract_sequence&lt;std::index_sequence&lt;Seq...&gt;&gt;
 {
     //使用Seq
-};<br>
+};
+
 foo(std::make_index_sequence&lt;5&gt;{});//foo内部得到 {0, 1, 2, 3, 4}
 extract_sequence&lt;std::make_index_sequence&lt;3&gt;&gt;;//extract_sequence内部得到 {0, 1, 2}
 </code></pre>
@@ -26,16 +28,20 @@ extract_sequence&lt;std::make_index_sequence&lt;3&gt;&gt;;//extract_sequence内�
 <pre><code>//主模板，递归实例化
 template&lt;std::size_t Base,std::size_t Step, std::size_t Count, std::size_t... Seq&gt;
 struct make_arithmetic_progression : make_arithmetic_progression&lt;Base + Step, Step, Count-1, Seq..., Base&gt;
-{<br>
-};<br>
+{
+
+};
+
 //递归终点特化版本
 template&lt;std::size_t Base, std::size_t Step, std::size_t... Seq&gt;
 struct make_arithmetic_progression&lt;Base, Step, 0, Seq...&gt;
 {
     using type = std::index_sequence&lt;Seq...&gt;;
-};<br>
+};
+
 template&lt;std::size_t Base, std::size_t Step, std::size_t Count&gt;
-using arithmetic_progression = typename make_arithmetic_progression&lt;Base, Step, Count&gt;::type;<br>
+using arithmetic_progression = typename make_arithmetic_progression&lt;Base, Step, Count&gt;::type;
+
 foo(arithmetic_progression&lt;1, 2, 3&gt;{});//foo内部得到 {1, 3, 5}
 extract_sequence&lt;arithmetic_progression&lt;3, 3, 3&gt;&gt;;//extract_sequence内部得到 {3, 6, 9}
 </code></pre>
@@ -61,37 +67,43 @@ extract_sequence&lt;arithmetic_progression&lt;3, 3, 3&gt;&gt;;//extract_sequence
 <summary>代码</summary>
 <pre><code>//list拼接类主模板
 template&lt;typename, typename&gt;
-struct index_list_concat;<br>
+struct index_list_concat;
+
 //list拼接类特化版本
 template&lt;std::size_t... Seq1, std::size_t... Seq2&gt;
 struct index_list_concat&lt;std::index_sequence&lt;Seq1...&gt;, std::index_sequence&lt;Seq2...&gt;&gt;
 {
     using type = std::index_sequence&lt;Seq1..., Seq2...&gt;;
-};<br>
+};
+
 //辅助分割主模板
 template&lt;std::size_t Base, std::size_t Step, std::size_t Count&gt;
 class make_arithmetic_progression
 {
     static constexpr std::size_t HalfCount = Count / 2;
-    static constexpr std::size_t HalfBase = Base + HalfCount * Step;<br>
+    static constexpr std::size_t HalfBase = Base + HalfCount * Step;
+
 public:
     using type = typename index_list_concat&lt;typename make_arithmetic_progression&lt;Base, Step, HalfCount&gt;::type,
                 typename make_arithmetic_progression&lt;HalfBase, Step, Count - HalfCount&gt;::type&gt;::type;
-};<br>
+};
+
 //拆分为1个元素特化版本
 template&lt;std::size_t Base, std::size_t Step&gt;
 class make_arithmetic_progression&lt;Base, Step, 1&gt;
 {
 public:
     using type = index_list&lt;Base&gt;;
-};<br>
+};
+
 //拆分为2个元素特化版本
 template&lt;std::size_t Base, std::size_t Step&gt;
 class make_arithmetic_progression&lt;Base, Step, 2&gt;
 {
 public:
     using type = index_list&lt;Base, Base + Step&gt;;
-};<br>
+};
+
 template&lt;std::size_t Base, std::size_t Step, std::size_t Count&gt;
 using arithmetic_progression = typename make_arithmetic_progression&lt;Base, Step, Count&gt;::type;
 </code></pre>
@@ -101,7 +113,8 @@ using arithmetic_progression = typename make_arithmetic_progression&lt;Base, Ste
 <p>上文说到可以间接使用标准库来实现这个等差数列模板。在我们初中的时候就知道，可以用公差为 1 的等差数列生成任意的其他等差数列：</p>
 $$
 \begin{aligned}
-a_n&=n (n=0,1,2,...)<br>\\\\
+a_n&=n (n=0,1,2,...)
+\\\\
 b_n&=a_n*d+k (n=0,1,2,...)//d为公差，k为首项
 \end{aligned}
 $$
@@ -110,7 +123,8 @@ $$
 <summary>代码</summary>
 <pre><code>//辅助推导函数
 template&lt;std::size_t Base, std::size_t Step, std::size_t... Seq&gt;
-std::index_sequence&lt;(Base + Step * Seq)...&gt; arithmetic_progression_helper(std::index_sequence&lt;Seq...&gt;);<br>
+std::index_sequence&lt;(Base + Step * Seq)...&gt; arithmetic_progression_helper(std::index_sequence&lt;Seq...&gt;);
+
 template&lt;std::size_t Base, std::size_t Step, std::size_t Count&gt;
 using arithmetic_progression = decltype(arithmetic_progression_helper&lt;Base, Step&gt;(std::make_index_sequence&lt;Count&gt;{}));
 </code></pre>

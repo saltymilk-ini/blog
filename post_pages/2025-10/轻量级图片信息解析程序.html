@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>轻量级图片信息解析程序</title><link rel="stylesheet" href="../../css/common.css"><link rel="stylesheet" href="../../css/post_content.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css"><script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script src="../../js/highlight_tip_code.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script></head><body><div class="page-title">轻量级图片信息解析程序</div><div class="container"><main class="main-area"><div class="navigate-text"><a href="../2025-12/C++ 语言特性的变更可能让你的防御成为马奇诺防线.html">上一篇</a> <a href="../../index.html">返回首页</a> <a href="../2025-09/C++ 模板参数推导问题小记（模板类的模板构造函数）.html">下一篇</a></div><h1>简介</h1>
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>轻量级图片信息解析程序</title><link rel="stylesheet" href="../../css/post_content.css"><link rel="stylesheet" href="../../css/common.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script><script src="../../js/highlight_tip_code.js"></script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script><script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script></head><body><div class="page-title">轻量级图片信息解析程序</div><div class="container"><main class="main-area"><div class="navigate-text"><a href="../2025-12/C++ 语言特性的变更可能让你的防御成为马奇诺防线.html">上一篇</a> <a href="../../index.html">返回首页</a> <a href="../2025-09/C++ 模板参数推导问题小记（模板类的模板构造函数）.html">下一篇</a></div><h1>简介</h1>
 <p>平时的工作中我经常需要获取图片文件的一些基本信息（宽度、高度、通道数、色深）。因为项目依赖 opencv，以前都是直接用的 opencv 来读入图片后获取这些信息的，opencv 读入图片是读取所有的数据，会影响效率和内存占用，后来改用 stb_image，但是发现它不支持 tif 格式的文件。来回在网上搜索了一些开源的图片解析工具都没有完全符合我的需求，遂打算自己写一个。</p>
 <h1>需求</h1>
 <p>程序的需求很简单：</p>
@@ -22,13 +22,15 @@ inline Endian check_endian(void)
 		return IHR_ENDIAN_LITTLE_ENDIAN;
 	else
 		return IHR_ENDIAN_BIG_ENDIAN;
-}<br>
+}
+
 //16位数据的字节序转换
 inline void change_endian_16_bit(void *addr)
 {
 	uint16_t u16 = *(uint16_t *)addr;
 	*(uint16_t *)addr = (u16 << 8 & 0xff00) | (u16 >> 8 & 0xff);
-}<br>
+}
+
 //32位数据的字节序转换
 inline void change_endian_32_bit(void *addr)
 {
@@ -38,7 +40,8 @@ inline void change_endian_32_bit(void *addr)
 	 	(u32 << 8  & 0xff0000) |
 		(u32 >> 8  & 0xff00) |
 		(u32 >> 24 & 0xff);
-}<br>
+}
+
 //64位数据的字节序转换
 inline void change_endian_64_bit(void *addr)
 {

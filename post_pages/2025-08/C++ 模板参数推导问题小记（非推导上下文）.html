@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>C++ 模板参数推导问题小记（非推导上下文）</title><link rel="stylesheet" href="../../css/common.css"><link rel="stylesheet" href="../../css/post_content.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css"><script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script src="../../js/highlight_tip_code.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script></head><body><div class="page-title">C++ 模板参数推导问题小记（非推导上下文）</div><div class="container"><main class="main-area"><div class="navigate-text"><a href="../2025-08/C++ 使用分治减小模板递归深度.html">上一篇</a> <a href="../../index.html">返回首页</a> <a href="../2025-07/C++ 习惯RAII思想.html">下一篇</a></div><p>最近遇到一个模板参数推导的问题，代码如下：</p>
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>C++ 模板参数推导问题小记（非推导上下文）</title><link rel="stylesheet" href="../../css/post_content.css"><link rel="stylesheet" href="../../css/common.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script><script src="../../js/highlight_tip_code.js"></script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script><script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script></head><body><div class="page-title">C++ 模板参数推导问题小记（非推导上下文）</div><div class="container"><main class="main-area"><div class="navigate-text"><a href="../2025-08/C++ 使用分治减小模板递归深度.html">上一篇</a> <a href="../../index.html">返回首页</a> <a href="../2025-07/C++ 习惯RAII思想.html">下一篇</a></div><p>最近遇到一个模板参数推导的问题，代码如下：</p>
 <details open>
 <summary>代码</summary>
 <pre><code>template&lt;typename T&gt;
@@ -115,7 +115,8 @@ void foo(S val)
 <pre><code>template&lt;typename T&gt;
 struct arithmetic_guard
 {
-  static_assert(std::is_arithmetic_v&lt;T&gt;, "instantiation requires arithmetic type");<br>
+  static_assert(std::is_arithmetic_v&lt;T&gt;, "instantiation requires arithmetic type");
+
   using type = T;
 }
 template&lt;typename T, typename = typename arithmetic_guard&lt;T&gt;::type&gt;
@@ -126,8 +127,7 @@ using scalar = T;
 <p>但是静态断言版本存在一个缺点，就是和 SFINAE 不兼容，假如我们想使用 scalar 来编写一个这样的模板：</p>
 <details open>
 <summary>代码</summary>
-<pre><code class="language-cpp">
-template&lt;typename T&gt;
+<pre><code class="language-cpp">template&lt;typename T&gt;
 auto selected_type_impl(int) -&gt; decltype(std::declval&lt;scalar&lt;T&gt;&gt;(), 0.0);
 template&lt;typename&gt;
 int selected_type_impl(...);
