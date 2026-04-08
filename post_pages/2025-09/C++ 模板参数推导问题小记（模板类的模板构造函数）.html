@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><title>C++ 模板参数推导问题小记（模板类的模板构造函数）</title><link rel="stylesheet" href="../../css/post_content.css"><link rel="stylesheet" href="../../css/common.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script><script src="../../js/highlight_tip_code.js"></script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script><script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script></head><body><div class="page-title">C++ 模板参数推导问题小记（模板类的模板构造函数）</div><div class="container"><main class="main-area"><div class="navigate-text"><a href="../2025-10/轻量级图片信息解析程序.html">上一篇</a> <a href="../../index.html">返回首页</a> <a href="../2025-08/C++ 使用分治减小模板递归深度.html">下一篇</a></div><p>本篇主要是为了记录在编写一个模板类的模板构造函数中遇到的初始化问题，以及针对这个问题展开的相关知识整理，文章就以引发这个问题的代码为标题了。</p>
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>C++ 模板参数推导问题小记（模板类的模板构造函数）</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css"><link rel="stylesheet" href="../../css/post_content.css"><link rel="stylesheet" href="../../css/common.css"><script src="../../js/highlight_tip_code.js"></script><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script><script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script></head><body><div class="page-title">C++ 模板参数推导问题小记（模板类的模板构造函数）</div><div class="container"><main class="main-area"><div class="navigate-text"><a href="../2025-10/轻量级图片信息解析程序.html">上一篇</a> <a href="../../index.html">返回首页</a> <a href="../2025-08/C++ 使用分治减小模板递归深度.html">下一篇</a></div><p>本篇主要是为了记录在编写一个模板类的模板构造函数中遇到的初始化问题，以及针对这个问题展开的相关知识整理，文章就以引发这个问题的代码为标题了。</p>
 <h1>问题代码</h1>
 <p>在编写一个代表空间点的模板类 <code>point</code> 时，我打算为它添加一个模板构造函数：</p>
 <details open>
@@ -85,16 +85,16 @@ point&lt;int, 3&gt; pi3({ 0, 1 });//无法通过编译
 <p>其实我们平时也经常在函数调用时使用这种语法：</p>
 <details open>
 <summary>代码</summary>
-<pre><code>void foo(int i, const std::vector<int> &vec);//函数签名
+<pre><code>void foo(int i, const std::vector&lt;int&gt; &vec);//函数签名
 foo(0, { 0, 1, 2 });//调用
 </code></pre>
 </details>
 <p>当它被用于类的初始化时，编译器自动匹配构造函数调用，匹配规则与普通函数是一样的。</p>
 <h1>再探 <code>point</code> 的初始化</h1>
 <p>前面对 <code>point</code> 构造的分析只是简化版，让我们再次详细分析这一句代码的解析过程：</p>
-<p><code>point<int, 3> pi3({ 0, 1 });</code> 这个调用中的 <code>({ 0, 1 })</code> 会匹配所有接受单个参数、名为 <code>point</code> 的函数。查看一下候选的函数，编译器发现有三个：用户定义的接受数组引用的构造函数，自动合成的拷贝构造函数，以及自动合成的移动构造函数。分别分析它们的匹配情况：</p>
+<p><code>point&lt;int, 3&gt; pi3({ 0, 1 });</code> 这个调用中的 <code>({ 0, 1 })</code> 会匹配所有接受单个参数、名为 <code>point</code> 的函数。查看一下候选的函数，编译器发现有三个：用户定义的接受数组引用的构造函数，自动合成的拷贝构造函数，以及自动合成的移动构造函数。分别分析它们的匹配情况：</p>
 <p>匹配接受数组引用的构造函数 <code>point&lt;int, 3&gt;::point&lt;int&gt;(const int (&arr)[3])</code>，此构造函数的形参是 <code>const int (&)[3]</code>。根据聚合类型的列表初始化规则，指定长度的数组可被元素数量小于或等于其长度的初始化列表初始化。此处创建一个临时数组 <code>int [3]</code> 并且被初始化为 <code>{ 0, 1, 0 }</code>，绑定到数组引用形参上，函数匹配成功。</p>
-<p>匹配拷贝构造函数 <code>point&lt;int, 3&gt;::point(const point&lt;int, 3&gt; &)</code>，其形参是 <code>const point&lt;int, 3&gt; &</code>。这里需要创建一个临时的 <code>point&lt;int, 3&gt;</code>，相当于 <code>point&lt;int, 3&gt; temp{ 0, 1 };</code>。显然，<code>point&lt;int, 3&gt;</code> 既不是聚合类型，也没有接受 <code>(int, int)</code> 的构造函数，更没有接受 <code>std::initializer_list<int></code> 的构造函数。这样一个临时的变量无法被创建出来，所以拷贝构造函数匹配失败。</p>
+<p>匹配拷贝构造函数 <code>point&lt;int, 3&gt;::point(const point&lt;int, 3&gt; &)</code>，其形参是 <code>const point&lt;int, 3&gt; &</code>。这里需要创建一个临时的 <code>point&lt;int, 3&gt;</code>，相当于 <code>point&lt;int, 3&gt; temp{ 0, 1 };</code>。显然，<code>point&lt;int, 3&gt;</code> 既不是聚合类型，也没有接受 <code>(int, int)</code> 的构造函数，更没有接受 <code>std::initializer_list&lt;int&gt;</code> 的构造函数。这样一个临时的变量无法被创建出来，所以拷贝构造函数匹配失败。</p>
 <p>移动构造函数的情形与拷贝构造函数相同，无法匹配。</p>
 <p>最终，自定义的那个接受数组引用的构造函数被选中用来初始化这个 <code>point&lt;int, 3&gt;</code> 实例。</p>
 <h1 id="Semantic Check And Optimization">语义检查与优化</h1>
